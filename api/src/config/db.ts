@@ -5,28 +5,32 @@ let pool: sql.ConnectionPool | null = null;
 export const getDbPool = async (): Promise<sql.ConnectionPool> => {
   if (pool) return pool;
 
-  const server = process.env.DB_SERVER;
-  const database = process.env.DB_DATABASE;
+  const password = process.env.DB_PASSWORD;
 
-  if (!server || !database) {
-    throw new Error("DB_SERVER and DB_DATABASE must be set");
+  if (!password) {
+    throw new Error("DB_PASSWORD must be set in .env for NTLM authentication");
   }
 
   pool = await new sql.ConnectionPool({
-    server,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database,
+    server: "192.168.4.102",
+    database: "TASK_DASHBOARD",
     options: {
-      encrypt: process.env.DB_ENCRYPT === "true",
+      encrypt: false,
       trustServerCertificate: true,
+    },
+    authentication: {
+      type: "ntlm",
+      options: {
+        domain: "TRANSPORT",
+        userName: "jeroen",
+        password: password,
+      },
     },
   }).connect();
 
   return pool;
 };
 
-// Handig voor tests / shutdown
 export const closeDbPool = async () => {
   if (pool) {
     await pool.close();
