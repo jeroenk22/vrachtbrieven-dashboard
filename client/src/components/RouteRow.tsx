@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import type { DashboardRoute } from '../types/dashboard';
 import { useTasks, useSetTaskChecked, useMarkRouteSeen } from '../hooks/useDashboard';
 import { TaskRow } from './TaskRow';
+import { LicensePlate } from './LicensePlate';
 import { formatTime, formatEuro } from '../utils/format';
 
 interface RouteRowProps {
@@ -84,11 +85,7 @@ export function RouteRow({ route, day, showChecked, userName }: RouteRowProps) {
         </span>
 
         {/* Kenteken */}
-        {route.Kenteken && (
-          <span className="text-xs font-mono bg-slate-900 border border-slate-600 text-slate-300 px-2 py-0.5 rounded">
-            {route.Kenteken}
-          </span>
-        )}
+        {route.Kenteken && <LicensePlate kenteken={route.Kenteken} />}
 
         {/* Starttijd */}
         <span className="text-slate-400 text-xs tabular-nums whitespace-nowrap">
