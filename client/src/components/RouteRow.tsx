@@ -85,8 +85,16 @@ export function RouteRow({ route, day, showChecked, userName }: RouteRowProps) {
 
         {/* Kenteken */}
         {route.Kenteken && (
-          <span className="text-xs font-mono bg-slate-900 border border-slate-600 text-slate-300 px-2 py-0.5 rounded">
-            {route.Kenteken}
+          <span className="inline-flex items-stretch rounded overflow-hidden border border-yellow-500/60 text-xs font-bold flex-shrink-0" style={{ fontFamily: 'Arial Black, Arial, sans-serif' }}>
+            {/* EU strip */}
+            <span className="flex flex-col items-center justify-center bg-blue-700 px-1 py-0.5 gap-0.5">
+              <span className="text-yellow-300" style={{ fontSize: '6px' }}>★</span>
+              <span className="text-white font-bold" style={{ fontSize: '7px' }}>NL</span>
+            </span>
+            {/* Kentekenplaat */}
+            <span className="bg-yellow-400 text-black px-2 py-0.5 tracking-widest uppercase">
+              {route.Kenteken}
+            </span>
           </span>
         )}
 
