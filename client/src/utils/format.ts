@@ -44,3 +44,15 @@ export function formatEuro(value: number | null | undefined): string {
 export function toDateInputValue(date: Date): string {
   return date.toISOString().split('T')[0];
 }
+
+/**
+ * Formatteert een Date naar "Dinsdag 9 maart om 21:45u"
+ */
+export function formatLastUpdated(date: Date): string {
+  const dag = date.toLocaleDateString('nl-NL', { weekday: 'long' });
+  const dagNum = date.getDate();
+  const maand = date.toLocaleDateString('nl-NL', { month: 'long' });
+  const tijd = date.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+  const dagCapitaal = dag.charAt(0).toUpperCase() + dag.slice(1);
+  return `${dagCapitaal} ${dagNum} ${maand} om ${tijd}u`;
+}

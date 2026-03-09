@@ -3,10 +3,10 @@
 // Hoofdlayout: datumpicker, gebruikersnaam, toggle, routelijst
 // ============================================================
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRoutes } from './hooks/useDashboard';
 import { RouteRow } from './components/RouteRow';
-import { toDateInputValue } from './utils/format';
+import { toDateInputValue, formatLastUpdated } from './utils/format';
 
 const DEFAULT_USER = 'jeroen'; // later vervangen door echte auth
 
@@ -15,7 +15,12 @@ export default function App() {
   const [userName, setUserName] = useState<string>(DEFAULT_USER);
   const [showChecked, setShowChecked] = useState<boolean>(false);
 
-  const { data: routes, isLoading, isError, refetch } = useRoutes(userName, day);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const { data: routes, isLoading, isError, refetch, dataUpdatedAt } = useRoutes(userName, day);
+
+  useEffect(() => {
+    if (dataUpdatedAt) setLastUpdated(new Date(dataUpdatedAt));
+  }, [dataUpdatedAt]);
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100">
@@ -66,6 +71,13 @@ export default function App() {
               />
             </div>
           </label>
+
+          {/* Laatst bijgewerkt */}
+          {lastUpdated && (
+            <span className="text-xs text-slate-500 italic">
+              Bijgewerkt: {formatLastUpdated(lastUpdated)}
+            </span>
+          )}
 
           {/* Ververs knop */}
           <button
