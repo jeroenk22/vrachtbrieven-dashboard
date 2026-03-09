@@ -1,0 +1,11 @@
+{
+  "name": "vrachtbrieven-dashboard",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently --names \"API,CLIENT\" --prefix-colors \"blue,green\" \"npm run dev --prefix api\" \"npm run dev --prefix client\"",
+    "test": "npm run test --prefix api"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
