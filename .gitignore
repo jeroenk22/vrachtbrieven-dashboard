@@ -1,6 +1,17 @@
-node_modules/
-dist/
-.env
-.env.local
+# Node (monorepo)
+**/node_modules/
+**/dist/
+**/.env
+
+# Logs
 *.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# VSCode
 .vscode/
+
+# Coverage
+coverage/
