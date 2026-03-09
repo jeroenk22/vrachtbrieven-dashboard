@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import dbHealthRoute from "./routes/dbHealth";
+import dashboardRouter from "./routes/dashboard";
 
 export const createApp = () => {
   const app = express();
@@ -16,6 +17,9 @@ export const createApp = () => {
 
   // DB health endpoint
   app.use(dbHealthRoute);
+
+  // Dashboard endpoints
+  app.use("/dashboard", dashboardRouter);
 
   return app;
 };
