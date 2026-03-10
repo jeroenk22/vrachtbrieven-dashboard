@@ -5,6 +5,7 @@ import {
   formatEuro,
   toDateInputValue,
   formatLastUpdated,
+  capitalizeFirst,
 } from '../utils/format';
 
 describe('formatTime', () => {
@@ -67,6 +68,20 @@ describe('toDateInputValue', () => {
   it('geeft YYYY-MM-DD formaat terug', () => {
     const result = toDateInputValue(new Date('2024-03-09T00:00:00Z'));
     expect(result).toBe('2024-03-09');
+  });
+});
+
+describe('capitalizeFirst', () => {
+  it('geeft lege string terug bij lege input', () => {
+    expect(capitalizeFirst('')).toBe('');
+  });
+
+  it('maakt de eerste letter een hoofdletter', () => {
+    expect(capitalizeFirst('jeroen')).toBe('Jeroen');
+  });
+
+  it('laat de rest van de string ongemoeid', () => {
+    expect(capitalizeFirst('jAnSeN')).toBe('JAnSeN');
   });
 });
 

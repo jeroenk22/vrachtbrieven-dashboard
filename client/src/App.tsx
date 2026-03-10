@@ -6,16 +6,22 @@
 import { useState, useEffect } from 'react';
 import { useRoutes } from './hooks/useDashboard';
 import { RouteRow } from './components/RouteRow';
-import { toDateInputValue, formatLastUpdated } from './utils/format';
-
-const DEFAULT_USER = 'jeroen'; // later vervangen door echte auth
+import { toDateInputValue, formatLastUpdated, capitalizeFirst } from './utils/format';
+import { fetchWhoAmI } from './api/dashboard';
 
 export default function App() {
   const [day, setDay] = useState<string>(toDateInputValue(new Date()));
-  const [userName, setUserName] = useState<string>(DEFAULT_USER);
+  const [userName, setUserName] = useState<string>('');
+  const [userNameError, setUserNameError] = useState<boolean>(false);
   const [showChecked, setShowChecked] = useState<boolean>(false);
 
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+
+  useEffect(() => {
+    fetchWhoAmI()
+      .then((name) => setUserName(capitalizeFirst(name)))
+      .catch(() => setUserNameError(true));
+  }, []);
   const { data: routes, isLoading, isError, refetch, dataUpdatedAt } = useRoutes(userName, day);
 
   useEffect(() => {
@@ -51,11 +57,19 @@ export default function App() {
             <input
               type="text"
               value={userName}
-              onChange={(e) => setUserName(e.target.value)}
+              onChange={(e) => { setUserName(e.target.value); setUserNameError(false); }}
               placeholder="gebruikersnaam"
-              className="bg-slate-700 border border-slate-600 rounded px-2 py-1 text-sm text-slate-200 w-32
-                         focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              className={`bg-slate-700 border rounded px-2 py-1 text-sm text-slate-200 w-32
+                         focus:outline-none focus:ring-1
+                         ${userNameError
+                           ? 'border-yellow-500 focus:border-yellow-500 focus:ring-yellow-500'
+                           : 'border-slate-600 focus:border-blue-500 focus:ring-blue-500'}`}
             />
+            {userNameError && (
+              <span className="text-xs text-yellow-500" title="Kon gebruikersnaam niet automatisch ophalen">
+                Vul handmatig in
+              </span>
+            )}
           </div>
 
           {/* Toon gecheckte taken toggle */}
