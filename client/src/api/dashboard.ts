@@ -36,6 +36,11 @@ export const setTaskChecked = async (body: {
   await api.post('/dashboard/tasks/check', body);
 };
 
+export const fetchWhoAmI = async (): Promise<string> => {
+  const { data } = await api.get<{ ok: boolean; username: string }>('/whoami');
+  return data.username;
+};
+
 export const markRouteSeen = async (body: {
   userName: string;
   rideId: number;

@@ -15,6 +15,11 @@ export const createApp = () => {
     res.status(200).json({ ok: true });
   });
 
+  app.get("/whoami", (_req, res) => {
+    const username = (process.env.USERNAME || process.env.USER || '').toLowerCase();
+    res.json({ ok: true, username });
+  });
+
   // DB health endpoint
   app.use(dbHealthRoute);
 

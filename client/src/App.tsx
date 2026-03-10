@@ -7,15 +7,18 @@ import { useState, useEffect } from 'react';
 import { useRoutes } from './hooks/useDashboard';
 import { RouteRow } from './components/RouteRow';
 import { toDateInputValue, formatLastUpdated } from './utils/format';
-
-const DEFAULT_USER = 'jeroen'; // later vervangen door echte auth
+import { fetchWhoAmI } from './api/dashboard';
 
 export default function App() {
   const [day, setDay] = useState<string>(toDateInputValue(new Date()));
-  const [userName, setUserName] = useState<string>(DEFAULT_USER);
+  const [userName, setUserName] = useState<string>('');
   const [showChecked, setShowChecked] = useState<boolean>(false);
 
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+
+  useEffect(() => {
+    fetchWhoAmI().then(setUserName).catch(() => {});
+  }, []);
   const { data: routes, isLoading, isError, refetch, dataUpdatedAt } = useRoutes(userName, day);
 
   useEffect(() => {
