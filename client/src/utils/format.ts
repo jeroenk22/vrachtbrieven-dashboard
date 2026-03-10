@@ -46,6 +46,14 @@ export function toDateInputValue(date: Date): string {
 }
 
 /**
+ * Geeft een string terug met de eerste letter als hoofdletter
+ */
+export function capitalizeFirst(value: string): string {
+  if (!value) return value;
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+/**
  * Formatteert een Date naar "Dinsdag 9 maart om 21:45u"
  */
 export function formatLastUpdated(date: Date): string {
