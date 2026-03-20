@@ -14,6 +14,7 @@ export function useRoutes(userName: string, day?: string) {
     queryKey: ['routes', userName, day],
     queryFn: () => fetchRoutes(userName, day),
     enabled: !!userName,
+    staleTime: 55_000,
     refetchInterval: 60_000,
   });
 }
@@ -36,9 +37,9 @@ export function useSetTaskChecked() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: setTaskChecked,
-    onSuccess: () => {
-      // Invalideer alle taken zodat de lijst direct ververst
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+    onSuccess: (_data, variables) => {
+      // Invalideer alleen de taken van de betreffende route
+      queryClient.invalidateQueries({ queryKey: ['tasks', variables.rideId] });
     },
   });
 }

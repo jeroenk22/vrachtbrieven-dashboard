@@ -187,6 +187,8 @@ describe("POST /dashboard/tasks/check", () => {
   it("roept setTaskChecked aan met correcte data", async () => {
     mockSetTaskChecked.mockResolvedValueOnce();
     const res = await request(app).post("/dashboard/tasks/check").send({
+      rideId: 1,
+      routeName: "101 Amsterdam",
       ordSubTaskNo: 42,
       checked: true,
       checkedBy: "jeroen",
@@ -195,6 +197,8 @@ describe("POST /dashboard/tasks/check", () => {
     expect(res.status).toBe(200);
     expect(res.body.ok).toBe(true);
     expect(mockSetTaskChecked).toHaveBeenCalledWith({
+      rideId: 1,
+      routeName: "101 Amsterdam",
       ordSubTaskNo: 42,
       checked: true,
       checkedBy: "jeroen",
@@ -202,11 +206,23 @@ describe("POST /dashboard/tasks/check", () => {
     });
   });
 
-  it("geeft 500 terug bij service error", async () => {
-    mockSetTaskChecked.mockRejectedValueOnce(new Error("DB fout"));
+  it("geeft 400 als rideId of routeName ontbreekt", async () => {
     const res = await request(app)
       .post("/dashboard/tasks/check")
       .send({ ordSubTaskNo: 42, checked: true, checkedBy: "jeroen" });
+    expect(res.status).toBe(400);
+    expect(res.body.ok).toBe(false);
+  });
+
+  it("geeft 500 terug bij service error", async () => {
+    mockSetTaskChecked.mockRejectedValueOnce(new Error("DB fout"));
+    const res = await request(app).post("/dashboard/tasks/check").send({
+      rideId: 1,
+      routeName: "101 Amsterdam",
+      ordSubTaskNo: 42,
+      checked: true,
+      checkedBy: "jeroen",
+    });
     expect(res.status).toBe(500);
     expect(res.body.ok).toBe(false);
   });
@@ -248,5 +264,28 @@ describe("POST /dashboard/routes/seen", () => {
       .send({ userName: "jeroen", rideId: 1, currentHash: 123 });
     expect(res.status).toBe(500);
     expect(res.body.ok).toBe(false);
+  });
+});
+
+// ------------------------------------------------------------
+// GET /dashboard/events (SSE)
+// ------------------------------------------------------------
+describe("GET /dashboard/events", () => {
+  it("geeft SSE headers terug", (done) => {
+    // SSE houdt de verbinding open; start een tijdelijke server en verbreek daarna de verbinding
+    const http = require("http");
+    const server = app.listen(0, () => {
+      const port = (server.address() as { port: number }).port;
+      const req = http.get(
+        `http://localhost:${port}/dashboard/events`,
+        (res: { statusCode: number; headers: Record<string, string> }) => {
+          expect(res.statusCode).toBe(200);
+          expect(res.headers["content-type"]).toContain("text/event-stream");
+          expect(res.headers["cache-control"]).toContain("no-cache");
+          req.destroy();
+          server.close(done);
+        }
+      );
+    });
   });
 });

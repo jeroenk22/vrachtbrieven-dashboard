@@ -28,6 +28,8 @@ export const fetchTasks = async (params: {
 };
 
 export const setTaskChecked = async (body: {
+  rideId: number;
+  routeName: string;
   ordSubTaskNo: number;
   checked: boolean;
   checkedBy: string;

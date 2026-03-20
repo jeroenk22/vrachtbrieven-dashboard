@@ -3,7 +3,7 @@
 // Eén routebalk met uitklapbare takenlijst
 // ============================================================
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import type { DashboardRoute } from '../types/dashboard';
 import { useTasks, useSetTaskChecked, useMarkRouteSeen } from '../hooks/useDashboard';
 import { TaskRow } from './TaskRow';
@@ -17,7 +17,7 @@ interface RouteRowProps {
   userName: string;
 }
 
-export function RouteRow({ route, day, showChecked, userName }: RouteRowProps) {
+export const RouteRow = memo(function RouteRow({ route, day, showChecked, userName }: RouteRowProps) {
   const [expanded, setExpanded] = useState(false);
 
   const { data: tasks, isLoading } = useTasks(
@@ -43,6 +43,8 @@ export function RouteRow({ route, day, showChecked, userName }: RouteRowProps) {
 
   const handleCheck = (task: { Taaknummer: number; IsChecked: number }, checked: boolean) => {
     checkTask({
+      rideId: route.RideId,
+      routeName: route.Route,
       ordSubTaskNo: task.Taaknummer,
       checked,
       checkedBy: userName,
@@ -180,4 +182,4 @@ export function RouteRow({ route, day, showChecked, userName }: RouteRowProps) {
       )}
     </div>
   );
-}
+});

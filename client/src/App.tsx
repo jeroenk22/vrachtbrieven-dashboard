@@ -3,25 +3,51 @@
 // Hoofdlayout: datumpicker, gebruikersnaam, toggle, routelijst
 // ============================================================
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRoutes } from './hooks/useDashboard';
+import { useSSE } from './hooks/useSSE';
 import { RouteRow } from './components/RouteRow';
+import { ToastContainer, type ToastItem } from './components/Toast';
 import { toDateInputValue, formatLastUpdated, capitalizeFirst } from './utils/format';
 import { fetchWhoAmI } from './api/dashboard';
 
 export default function App() {
   const [day, setDay] = useState<string>(toDateInputValue(new Date()));
-  const [userName, setUserName] = useState<string>('');
+  const [userName, setUserName] = useState<string>(() => localStorage.getItem('userName') ?? '');
   const [userNameError, setUserNameError] = useState<boolean>(false);
-  const [showChecked, setShowChecked] = useState<boolean>(false);
+  const [showChecked, setShowChecked] = useState<boolean>(
+    () => localStorage.getItem('showChecked') === 'true'
+  );
+  const [toasts, setToasts] = useState<ToastItem[]>([]);
 
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
+  // Persisteer userName in localStorage
   useEffect(() => {
-    fetchWhoAmI()
-      .then((name) => setUserName(capitalizeFirst(name)))
-      .catch(() => setUserNameError(true));
+    localStorage.setItem('userName', userName);
+  }, [userName]);
+
+  // Persisteer showChecked in localStorage
+  useEffect(() => {
+    localStorage.setItem('showChecked', String(showChecked));
+  }, [showChecked]);
+
+  // Haal automatisch userName op als localStorage leeg is
+  useEffect(() => {
+    if (!userName) {
+      fetchWhoAmI()
+        .then((name) => setUserName(capitalizeFirst(name)))
+        .catch(() => setUserNameError(true));
+    }
   }, []);
+
+  const addToast = useCallback((message: string) => {
+    const id = Date.now();
+    setToasts((prev) => [...prev, { id, message }]);
+    setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 4000);
+  }, []);
+
+  useSSE(userName, addToast);
   const { data: routes, isLoading, isError, refetch, dataUpdatedAt } = useRoutes(userName, day);
 
   useEffect(() => {
@@ -135,6 +161,8 @@ export default function App() {
           />
         ))}
       </main>
+
+      <ToastContainer items={toasts} />
     </div>
   );
 }
