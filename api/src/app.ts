@@ -3,6 +3,7 @@ import cors from "cors";
 import helmet from "helmet";
 import dbHealthRoute from "./routes/dbHealth";
 import dashboardRouter from "./routes/dashboard";
+import dossierRouter from "./routes/dossier";
 
 export const createApp = () => {
   const app = express();
@@ -25,6 +26,9 @@ export const createApp = () => {
 
   // Dashboard endpoints
   app.use("/dashboard", dashboardRouter);
+
+  // Dossier bestanden (Mendrix netwerk)
+  app.use("/dossier", dossierRouter);
 
   return app;
 };

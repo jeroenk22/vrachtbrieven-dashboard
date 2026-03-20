@@ -108,7 +108,11 @@ export function RouteRow({ route, day, showChecked, userName }: RouteRowProps) {
 
         {/* Foto indicator */}
         {route.HeeftFotos === 1 && (
-          <span className="text-sm" title="Heeft foto's">📷</span>
+          <span className="relative inline-flex items-center justify-center" title="Heeft foto's">
+            <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 text-slate-400">
+              <path fillRule="evenodd" d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586A2 2 0 0113 4.586L12.414 4H7.586L7 4.586A2 2 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+            </svg>
+          </span>
         )}
 
         {/* Chevron */}
