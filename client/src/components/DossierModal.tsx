@@ -4,16 +4,24 @@
 // ============================================================
 
 import { useEffect, useRef, useState } from 'react';
+import Flag from 'react-world-flags';
 import { createPortal } from 'react-dom';
 import { fetchDossierFiles, getDossierFileUrl } from '../api/dossier';
 import type { DossierFile } from '../api/dossier';
 import { formatDateTime } from '../utils/format';
+import { formatRouteName, countryIso } from '../utils/dossierMeta';
 
 export interface TaskMeta {
+  route: string | null;
   chauffeur: string | null;
   kenteken: string | null;
   afgerondTot: string | null;
   product: string | null;
+  klantnaam: string | null;
+  klantnummer: string | null;
+  locatieNaam: string | null;
+  locatiePlaats: string | null;
+  locatieLand: string | null;
 }
 
 interface DossierModalProps {
@@ -21,6 +29,7 @@ interface DossierModalProps {
   meta: TaskMeta;
   onClose: () => void;
 }
+
 
 function FileIcon({ ext }: { ext: string }) {
   const color =
@@ -66,6 +75,16 @@ function Lightbox({ images, index, orderId, meta, onClose, onPrev, onNext }: Lig
   const trRef = useRef(tr);
   trRef.current = tr;
 
+  const [rotation, setRotation] = useState(0);
+
+  const [copied, setCopied] = useState(false);
+  const copyOrderId = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(String(orderId));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   // Drag state — alles in refs zodat window-listeners geen stale closures hebben
   const dragRef = useRef<{ mx: number; my: number; ox: number; oy: number } | null>(null);
   const didDrag = useRef(false);
@@ -76,6 +95,7 @@ function Lightbox({ images, index, orderId, meta, onClose, onPrev, onNext }: Lig
   // Reset bij wisselen van foto
   useEffect(() => {
     setTr({ zoom: 1, x: 0, y: 0 });
+    setRotation(0);
   }, [index]);
 
   // Wheel-zoom — non-passive zodat preventDefault werkt
@@ -162,14 +182,36 @@ function Lightbox({ images, index, orderId, meta, onClose, onPrev, onNext }: Lig
       className="fixed inset-0 z-[60] flex flex-col items-center justify-center bg-black/95 select-none"
       onClick={() => { if (trRef.current.zoom > 1) setTr({ zoom: 1, x: 0, y: 0 }); else onClose(); }}
     >
-      {/* Sluitknop */}
-      <button
-        className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/10 hover:bg-white/25 flex items-center justify-center text-white transition-colors"
-        onClick={e => { e.stopPropagation(); onClose(); }}
-        title="Sluiten (Esc)"
-      >
-        <CloseIcon />
-      </button>
+      {/* Sluitknop + draaiknoppen */}
+      <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
+        <button
+          className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/25 flex items-center justify-center text-white transition-colors"
+          onClick={e => { e.stopPropagation(); setRotation(r => r - 90); }}
+          title="Linksom draaien"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 10a9 9 0 1 0 9-9" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 4v6h6" />
+          </svg>
+        </button>
+        <button
+          className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/25 flex items-center justify-center text-white transition-colors"
+          onClick={e => { e.stopPropagation(); setRotation(r => r + 90); }}
+          title="Rechtsom draaien"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 10a9 9 0 1 1-9-9" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 4v6h-6" />
+          </svg>
+        </button>
+        <button
+          className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/25 flex items-center justify-center text-white transition-colors"
+          onClick={e => { e.stopPropagation(); onClose(); }}
+          title="Sluiten (Esc)"
+        >
+          <CloseIcon />
+        </button>
+      </div>
 
       {/* Teller */}
       <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-3 text-slate-400 text-xs bg-black/50 rounded-full px-4 py-1.5 pointer-events-none">
@@ -180,7 +222,7 @@ function Lightbox({ images, index, orderId, meta, onClose, onPrev, onNext }: Lig
       {/* Foto */}
       <div
         className={`${cursor}`}
-        style={{ transform: `translate(${tr.x}px, ${tr.y}px) scale(${tr.zoom})` }}
+        style={{ transform: `translate(${tr.x}px, ${tr.y}px) scale(${tr.zoom}) rotate(${rotation}deg)` }}
         onMouseDown={handleMouseDown}
         onClick={e => e.stopPropagation()}
       >
@@ -218,18 +260,32 @@ function Lightbox({ images, index, orderId, meta, onClose, onPrev, onNext }: Lig
 
       {/* Info-balk */}
       <div
-        className="absolute bottom-0 left-0 right-0 px-6 py-4 bg-gradient-to-t from-black/80 to-transparent flex flex-wrap items-end gap-x-6 gap-y-1 pointer-events-none"
+        className="absolute bottom-0 left-0 right-0 z-10 px-6 py-4 bg-black/75 flex flex-wrap items-center gap-x-6 gap-y-1 pointer-events-none"
       >
-        <div>
-          <p className="text-slate-500 text-[10px] uppercase tracking-wide">Order</p>
-          <p className="text-slate-100 text-sm font-medium">{orderId}</p>
-        </div>
+        {meta.route && (
+          <div>
+            <p className="text-slate-500 text-[10px] uppercase tracking-wide">Route</p>
+            <p className="text-slate-100 text-sm font-medium">{formatRouteName(meta.route)}</p>
+          </div>
+        )}
         {meta.chauffeur && (
           <div>
             <p className="text-slate-500 text-[10px] uppercase tracking-wide">Chauffeur</p>
             <p className="text-slate-100 text-sm font-medium">{meta.chauffeur}</p>
           </div>
         )}
+        <div
+          className="relative group/order pointer-events-auto cursor-pointer"
+          onClick={copyOrderId}
+        >
+          <p className="text-slate-500 text-[10px] uppercase tracking-wide">Order</p>
+          <p className="text-slate-100 text-sm font-medium">{orderId}</p>
+          <div className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-700 px-2.5 py-1 text-[11px] text-slate-200 shadow-lg transition-opacity duration-150
+            pointer-events-none
+            opacity-0 group-hover/order:opacity-100">
+            {copied ? 'Ordernummer gekopieerd!' : 'Klik om te kopiëren'}
+          </div>
+        </div>
         {meta.kenteken && (
           <div>
             <p className="text-slate-500 text-[10px] uppercase tracking-wide">Kenteken</p>
@@ -246,6 +302,23 @@ function Lightbox({ images, index, orderId, meta, onClose, onPrev, onNext }: Lig
           <div>
             <p className="text-slate-500 text-[10px] uppercase tracking-wide">Product</p>
             <p className="text-slate-100 text-sm font-medium">{meta.product}</p>
+          </div>
+        )}
+        {meta.klantnaam && (
+          <div>
+            <p className="text-slate-500 text-[10px] uppercase tracking-wide">Klant</p>
+            <p className="text-slate-100 text-sm font-medium">
+              {meta.klantnaam}{meta.klantnummer ? <span className="text-slate-400 font-normal"> ({meta.klantnummer})</span> : null}
+            </p>
+          </div>
+        )}
+        {(meta.locatieNaam || meta.locatiePlaats) && (
+          <div>
+            <p className="text-slate-500 text-[10px] uppercase tracking-wide">Locatie</p>
+            <p className="text-slate-100 text-sm font-medium flex items-center gap-1.5">
+              {[meta.locatieNaam, meta.locatiePlaats].filter(Boolean).join(', ')}
+              {countryIso(meta.locatieLand) && <Flag code={countryIso(meta.locatieLand)!} style={{ height: '14px', width: 'auto', borderRadius: '2px' }} />}
+            </p>
           </div>
         )}
         <div className="ml-auto">

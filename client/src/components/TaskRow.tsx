@@ -120,10 +120,16 @@ export function TaskRow({ task, showChecked, onCheck }: TaskRowProps) {
                 <DossierModal
                   orderId={task.OrderId}
                   meta={{
+                    route: task.Route,
                     chauffeur: task.NaamChauffeur,
                     kenteken: task.Kenteken,
                     afgerondTot: task.AfgerondTot,
                     product: task.ProductOmschrijving ?? task.Product,
+                    klantnaam: task.Klantnaam,
+                    klantnummer: task.Klantnummer,
+                    locatieNaam: task.Naam,
+                    locatiePlaats: task.Plaats,
+                    locatieLand: task.Land,
                   }}
                   onClose={() => setDossierOpen(false)}
                 />

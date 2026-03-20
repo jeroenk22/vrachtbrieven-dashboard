@@ -55,6 +55,7 @@ export interface DashboardTask {
   Naam: string | null;
   Adres: string | null;
   Plaats: string | null;
+  Land: string | null;
   Commentaar: string | null;
   Instructies: string | null;
   Wachttijd: number | null;
