@@ -132,14 +132,30 @@ export function RouteRow({ route, day, showChecked, userName }: RouteRowProps) {
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="text-[11px] uppercase tracking-wide text-slate-500 bg-slate-900/60">
-                    <th className="px-3 py-2 text-left">Taak / Type</th>
-                    <th className="px-3 py-2 text-left">Klant</th>
-                    <th className="px-3 py-2 text-left">Locatie</th>
-                    <th className="px-3 py-2 text-left">Tijd</th>
-                    <th className="px-3 py-2 text-left">Status</th>
-                    <th className="px-3 py-2 text-left">Info</th>
-                    <th className="px-3 py-2 text-left">Gecheckt door</th>
-                    <th className="px-3 py-2 text-left">✓</th>
+                    <th className="px-2 py-1.5 text-left">Type</th>
+                    <th className="px-2 py-1.5 text-left">Klantnr.</th>
+                    <th className="px-2 py-1.5 text-left">Status</th>
+                    <th className="px-2 py-1.5 text-left">Klantnaam</th>
+                    <th className="px-2 py-1.5 text-left">Product</th>
+                    <th className="px-2 py-1.5 text-right">Omzet</th>
+                    <th className="px-2 py-1.5 text-left">Naam</th>
+                    <th className="px-2 py-1.5 text-left">Adres</th>
+                    <th className="px-2 py-1.5 text-left">Plaats</th>
+                    <th className="px-2 py-1.5 text-left">Colli</th>
+                    <th className="px-2 py-1.5 text-center">
+                      <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 inline-block">
+                        <path fillRule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v7a2 2 0 01-2 2H6l-4 4V5z" clipRule="evenodd" />
+                      </svg>
+                    </th>
+                    <th className="px-2 py-1.5 text-center">
+                      <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 inline-block">
+                        <path fillRule="evenodd" d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586A2 2 0 0113 4.586L12.414 4H7.586L7 4.586A2 2 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+                      </svg>
+                    </th>
+                    <th className="px-2 py-1.5 text-left">Gepland</th>
+                    <th className="px-2 py-1.5 text-left">Gewenst</th>
+                    <th className="px-2 py-1.5 text-left">Gecheckt door</th>
+                    <th className="px-2 py-1.5 text-left">✓</th>
                   </tr>
                 </thead>
                 <tbody>
