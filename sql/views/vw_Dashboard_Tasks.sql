@@ -31,6 +31,7 @@ SELECT
   t.LocName AS Naam,
   t.LocStreet AS Adres,
   t.LocCity AS Plaats,
+  t.LocCountry AS Land,
   t.Comments AS Commentaar,
   t.Notes AS Instructies,
   t.WaitUnits AS Wachttijd,

@@ -3,12 +3,14 @@
 // Eén taakregel in de uitgeklapte routeweergave
 // ============================================================
 
+import { useState } from 'react';
 import type { DashboardTask } from '../types/dashboard';
 import { formatTime, formatDateTime, formatEuro } from '../utils/format';
 import { getStatusLabel } from '../config/statusCodes';
 import { TaskTypeIcon } from './TaskTypeIcon';
 import { Tooltip } from './Tooltip';
 import { TruncatedCell } from './TruncatedCell';
+import { DossierModal } from './DossierModal';
 
 interface TaskRowProps {
   task: DashboardTask;
@@ -20,6 +22,7 @@ interface TaskRowProps {
 export function TaskRow({ task, showChecked, onCheck }: TaskRowProps) {
   const isChecked = task.IsChecked === 1;
   const isHidden = isChecked && !showChecked;
+  const [dossierOpen, setDossierOpen] = useState(false);
 
   if (isHidden) return null;
 
@@ -95,13 +98,43 @@ export function TaskRow({ task, showChecked, onCheck }: TaskRowProps) {
         )}
       </td>
 
-      {/* Foto's */}
+      {/* Foto's / dossier */}
       <td className={`${tdBase} text-center`}>
         <div className="flex items-center justify-center gap-1.5">
           {task.AantalFotos > 0 && (
-            <Tooltip text={`${task.AantalFotos} foto('s)`}>
-              <span className="text-sm">📷</span>
-            </Tooltip>
+            <>
+              <Tooltip text={`${task.AantalFotos} foto('s) — klik om te bekijken`}>
+                <button
+                  onClick={() => setDossierOpen(true)}
+                  className="relative inline-flex items-center justify-center group/cam cursor-pointer"
+                >
+                  <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 text-slate-400 group-hover/cam:text-blue-400 transition-colors">
+                    <path fillRule="evenodd" d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586A2 2 0 0113 4.586L12.414 4H7.586L7 4.586A2 2 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+                  </svg>
+                  <span className="absolute -top-1.5 -right-2 min-w-[14px] h-[14px] px-0.5 bg-blue-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center leading-none">
+                    {task.AantalFotos}
+                  </span>
+                </button>
+              </Tooltip>
+              {dossierOpen && (
+                <DossierModal
+                  orderId={task.OrderId}
+                  meta={{
+                    route: task.Route,
+                    chauffeur: task.NaamChauffeur,
+                    kenteken: task.Kenteken,
+                    afgerondTot: task.AfgerondTot,
+                    product: task.ProductOmschrijving ?? task.Product,
+                    klantnaam: task.Klantnaam,
+                    klantnummer: task.Klantnummer,
+                    locatieNaam: task.Naam,
+                    locatiePlaats: task.Plaats,
+                    locatieLand: task.Land,
+                  }}
+                  onClose={() => setDossierOpen(false)}
+                />
+              )}
+            </>
           )}
           {task.LastEmailSentAt && (
             <Tooltip text={`Email verstuurd: ${formatDateTime(task.LastEmailSentAt)}`}>
