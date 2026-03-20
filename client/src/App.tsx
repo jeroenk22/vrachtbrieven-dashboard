@@ -32,7 +32,7 @@ export default function App() {
     <div className="min-h-screen bg-slate-900 text-slate-100">
       {/* Header */}
       <header className="bg-slate-800/80 border-b border-slate-700 sticky top-0 z-10 backdrop-blur">
-        <div className="max-w-full mx-4 px-4 py-3 flex flex-wrap items-center gap-4">
+        <div className="max-w-full mx-2 px-4 py-3 flex flex-wrap items-center gap-4">
 
           {/* Titel */}
           <h1 className="text-base font-bold tracking-tight text-white mr-2">
@@ -108,7 +108,7 @@ export default function App() {
       </header>
 
       {/* Main content */}
-      <main className="max-w-full mx-4 px-4 py-4">
+      <main className="max-w-full mx-2 px-4 py-4">
         {isLoading && (
           <div className="text-slate-400 text-sm py-8 text-center animate-pulse">Routes laden...</div>
         )}
