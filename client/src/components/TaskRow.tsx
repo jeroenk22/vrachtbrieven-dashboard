@@ -7,6 +7,7 @@ import type { DashboardTask } from '../types/dashboard';
 import { formatTime, formatDateTime, formatEuro } from '../utils/format';
 import { getStatusLabel } from '../config/statusCodes';
 import { TaskTypeIcon } from './TaskTypeIcon';
+import { Tooltip } from './Tooltip';
 
 interface TaskRowProps {
   task: DashboardTask;
@@ -88,11 +89,11 @@ export function TaskRow({ task, showChecked, onCheck }: TaskRowProps) {
       {/* Commentaar */}
       <td className={`${tdBase} text-center`}>
         {task.Commentaar && (
-          <span title={task.Commentaar} className="cursor-default text-slate-400 hover:text-slate-200 transition-colors">
-            <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 inline-block">
+          <Tooltip text={task.Commentaar}>
+            <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 text-slate-400 hover:text-slate-200 transition-colors cursor-default">
               <path fillRule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v7a2 2 0 01-2 2H6l-4 4V5z" clipRule="evenodd" />
             </svg>
-          </span>
+          </Tooltip>
         )}
       </td>
 
@@ -100,10 +101,14 @@ export function TaskRow({ task, showChecked, onCheck }: TaskRowProps) {
       <td className={`${tdBase} text-center`}>
         <div className="flex items-center justify-center gap-1.5">
           {task.AantalFotos > 0 && (
-            <span title={`${task.AantalFotos} foto('s)`} className="text-sm">📷</span>
+            <Tooltip text={`${task.AantalFotos} foto('s)`}>
+              <span className="text-sm">📷</span>
+            </Tooltip>
           )}
           {task.LastEmailSentAt && (
-            <span title={`Email verstuurd: ${formatDateTime(task.LastEmailSentAt)}`} className="text-sm">✉️</span>
+            <Tooltip text={`Email verstuurd: ${formatDateTime(task.LastEmailSentAt)}`}>
+              <span className="text-sm">✉️</span>
+            </Tooltip>
           )}
         </div>
       </td>
@@ -135,9 +140,9 @@ export function TaskRow({ task, showChecked, onCheck }: TaskRowProps) {
 
       {/* Check knop */}
       <td className="px-3 py-2">
+        <Tooltip text={isChecked ? 'Klik om te unchecken' : 'Klik om te checken'}>
         <button
           onClick={() => onCheck(task, !isChecked)}
-          title={isChecked ? 'Klik om te unchecken' : 'Klik om te checken'}
           className={`
             w-6 h-6 rounded border-2 flex items-center justify-center transition-all
             ${isChecked
@@ -151,6 +156,7 @@ export function TaskRow({ task, showChecked, onCheck }: TaskRowProps) {
             </svg>
           )}
         </button>
+        </Tooltip>
       </td>
     </tr>
   );

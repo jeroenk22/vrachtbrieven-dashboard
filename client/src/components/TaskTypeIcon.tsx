@@ -4,6 +4,7 @@
 // ============================================================
 
 import { getTaskTypeConfig } from '../config/statusCodes';
+import { Tooltip } from './Tooltip';
 
 const COLORS = {
   green:  { bg: 'bg-green-600',  hover: 'bg-green-500',  border: 'border-green-500'  },
@@ -67,16 +68,15 @@ export function TaskTypeIcon({ type }: TaskTypeIconProps) {
   const c = COLORS[config.color];
 
   return (
-    <span
-      title={config.label}
-      className={`inline-flex items-center justify-center w-6 h-6 rounded ${c.bg} text-white shadow-sm select-none`}
-    >
-      <span className="flex flex-col items-center gap-0.5">
-        <TruckIcon />
-        {config.color === 'green'  && <ArrowDown />}
-        {config.color === 'orange' && <ArrowUp />}
-        {config.color === 'blue'   && <ArrowSwap />}
+    <Tooltip text={config.label}>
+      <span className={`inline-flex items-center justify-center w-6 h-6 rounded ${c.bg} text-white shadow-sm select-none`}>
+        <span className="flex flex-col items-center gap-0.5">
+          <TruckIcon />
+          {config.color === 'green'  && <ArrowDown />}
+          {config.color === 'orange' && <ArrowUp />}
+          {config.color === 'blue'   && <ArrowSwap />}
+        </span>
       </span>
-    </span>
+    </Tooltip>
   );
 }
