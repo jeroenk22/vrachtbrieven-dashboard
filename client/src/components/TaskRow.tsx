@@ -4,7 +4,9 @@
 // ============================================================
 
 import type { DashboardTask } from '../types/dashboard';
-import { formatTime, formatDateTime } from '../utils/format';
+import { formatTime, formatDateTime, formatEuro } from '../utils/format';
+import { getStatusLabel } from '../config/statusCodes';
+import { TaskTypeIcon } from './TaskTypeIcon';
 
 interface TaskRowProps {
   task: DashboardTask;
@@ -13,84 +15,123 @@ interface TaskRowProps {
   onCheck: (task: DashboardTask, checked: boolean) => void;
 }
 
-export function TaskRow({ task, showChecked, checkedBy, onCheck }: TaskRowProps) {
+export function TaskRow({ task, showChecked, onCheck }: TaskRowProps) {
   const isChecked = task.IsChecked === 1;
   const isHidden = isChecked && !showChecked;
 
   if (isHidden) return null;
 
-  const tijdVan = formatTime(task.GeplandVan ?? task.GewenstVan);
-  const tijdTot = formatTime(task.GeplandTot ?? task.GewenstTot);
+  const tdBase = 'px-2 py-1 text-xs';
+  const tdMuted = `${tdBase} text-slate-400`;
 
   return (
     <tr
       className={`
-        border-b border-slate-700 text-sm transition-colors
+        border-b border-slate-700 text-xs transition-colors
         ${isChecked
           ? 'bg-slate-800/40 text-slate-500'
           : 'bg-slate-800/80 hover:bg-slate-700/60 text-slate-200'}
       `}
     >
-      {/* Taaknummer + type */}
-      <td className="px-3 py-2 font-mono text-xs text-slate-400 whitespace-nowrap">
-        <span className="font-semibold text-slate-300">{task.Taaknummer}</span>
-        {task.Type && (
-          <span className={`ml-2 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide
-            ${task.Type === 'L' ? 'bg-blue-900/60 text-blue-300' : 'bg-amber-900/60 text-amber-300'}`}>
-            {task.Type}
+      {/* Type + taaknummer */}
+      <td className="px-2 py-1 whitespace-nowrap">
+        <div className="flex items-center gap-1.5">
+          <TaskTypeIcon type={task.Type} />
+          <span className="font-mono font-semibold text-slate-300 text-xs">{task.Taaknummer}</span>
+        </div>
+      </td>
+
+      {/* Klantnummer */}
+      <td className={tdMuted}>{task.Klantnummer ?? '-'}</td>
+
+      {/* Taakstatus + probleemstatus */}
+      <td className={tdMuted}>
+        <div>{getStatusLabel(task.Status)}</div>
+        {task.ProbleemStatusNaam && (
+          <div className="text-red-400 mt-0.5">{task.ProbleemStatusNaam}</div>
+        )}
+      </td>
+
+      {/* Klantnaam */}
+      <td className={tdBase}>
+        <div className="font-medium truncate max-w-[160px]">{task.Klantnaam ?? '-'}</div>
+      </td>
+
+      {/* Product */}
+      <td className={tdMuted}>{task.Product ?? '-'}</td>
+
+      {/* Omzet */}
+      <td className={`${tdMuted} text-right tabular-nums whitespace-nowrap`}>
+        {formatEuro(task.Omzet)}
+      </td>
+
+      {/* Naam */}
+      <td className={tdMuted}>
+        <div className="truncate max-w-[140px]">{task.Naam ?? '-'}</div>
+      </td>
+
+      {/* Adres */}
+      <td className={tdMuted}>
+        <div className="truncate max-w-[160px]">{task.Adres ?? '-'}</div>
+      </td>
+
+      {/* Plaats */}
+      <td className={tdMuted}>
+        <div className="truncate max-w-[120px]">{task.Plaats ?? '-'}</div>
+      </td>
+
+      {/* Colliomschrijving */}
+      <td className={tdMuted}>
+        <div className="truncate max-w-[120px]">{task.Colliomschrijving ?? '-'}</div>
+      </td>
+
+      {/* Commentaar */}
+      <td className={`${tdBase} text-center`}>
+        {task.Commentaar && (
+          <span title={task.Commentaar} className="cursor-default text-slate-400 hover:text-slate-200 transition-colors">
+            <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 inline-block">
+              <path fillRule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v7a2 2 0 01-2 2H6l-4 4V5z" clipRule="evenodd" />
+            </svg>
           </span>
         )}
       </td>
 
-      {/* Klant */}
-      <td className="px-3 py-2">
-        <div className="font-medium truncate max-w-[180px]">{task.Klantnaam ?? '-'}</div>
-        {task.ProbleemStatusNaam && (
-          <div className="text-xs text-red-400 mt-0.5">{task.ProbleemStatusNaam}</div>
-        )}
-      </td>
-
-      {/* Locatie */}
-      <td className="px-3 py-2 text-slate-400 text-xs">
-        <div className="truncate max-w-[200px]">{task.Naam ?? '-'}</div>
-        <div className="truncate max-w-[200px]">{task.Adres} {task.Plaats}</div>
-      </td>
-
-      {/* Tijden */}
-      <td className="px-3 py-2 whitespace-nowrap text-xs tabular-nums">
-        <span className="text-slate-300">{tijdVan}</span>
-        <span className="text-slate-500 mx-1">–</span>
-        <span className="text-slate-300">{tijdTot}</span>
-      </td>
-
-      {/* Status */}
-      <td className="px-3 py-2 text-xs text-slate-400">
-        {task.Status ?? '-'}
-      </td>
-
-      {/* Indicatoren */}
-      <td className="px-3 py-2">
-        <div className="flex items-center gap-2">
+      {/* Foto's */}
+      <td className={`${tdBase} text-center`}>
+        <div className="flex items-center justify-center gap-1.5">
           {task.AantalFotos > 0 && (
-            <span title={`${task.AantalFotos} foto('s)`} className="text-base">📷</span>
+            <span title={`${task.AantalFotos} foto('s)`} className="text-sm">📷</span>
           )}
           {task.LastEmailSentAt && (
-            <span title={`Email verstuurd: ${formatDateTime(task.LastEmailSentAt)}`} className="text-base">✉️</span>
+            <span title={`Email verstuurd: ${formatDateTime(task.LastEmailSentAt)}`} className="text-sm">✉️</span>
           )}
         </div>
       </td>
 
+      {/* Gepland (MomentPTA) */}
+      <td className={`${tdMuted} tabular-nums whitespace-nowrap`}>
+        {formatTime(task.GeplandVan) ?? '-'}
+      </td>
+
+      {/* Gewenst (MomentETA – MomentETD) */}
+      <td className={`${tdMuted} tabular-nums whitespace-nowrap`}>
+        <span>{formatTime(task.GewenstVan)}</span>
+        <span className="mx-1 text-slate-600">–</span>
+        <span>{formatTime(task.GewenstTot)}</span>
+      </td>
+
       {/* Check info (alleen zichtbaar als gecheckt + showChecked) */}
-      {isChecked && showChecked && (
-        <td className="px-3 py-2 text-xs text-slate-500 whitespace-nowrap">
+      {isChecked && showChecked ? (
+        <td className={`${tdMuted} whitespace-nowrap`}>
           <div>{task.CheckedBy}</div>
           <div>{formatDateTime(task.CheckedAt)}</div>
           {task.CheckedComment && (
             <div className="italic text-slate-600 truncate max-w-[120px]">{task.CheckedComment}</div>
           )}
         </td>
+      ) : (
+        <td />
       )}
-      {!(isChecked && showChecked) && <td />}
 
       {/* Check knop */}
       <td className="px-3 py-2">
