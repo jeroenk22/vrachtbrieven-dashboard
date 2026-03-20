@@ -8,7 +8,6 @@ import { formatTime, formatDateTime, formatEuro } from '../utils/format';
 import { getStatusLabel } from '../config/statusCodes';
 import { TaskTypeIcon } from './TaskTypeIcon';
 import { Tooltip } from './Tooltip';
-import { TruncatedCell } from './TruncatedCell';
 
 interface TaskRowProps {
   task: DashboardTask;
@@ -56,16 +55,11 @@ export function TaskRow({ task, showChecked, onCheck }: TaskRowProps) {
 
       {/* Klantnaam */}
       <td className={tdBase}>
-        <TruncatedCell text={task.Klantnaam} maxWidth="max-w-[160px]" className="font-medium" />
+        <div className="font-medium truncate max-w-[160px]">{task.Klantnaam ?? '-'}</div>
       </td>
 
       {/* Product */}
-      <td className={tdMuted}>
-        {task.ProductOmschrijving
-          ? <Tooltip text={task.ProductOmschrijving}><span>{task.Product ?? '-'}</span></Tooltip>
-          : (task.Product ?? '-')
-        }
-      </td>
+      <td className={tdMuted}>{task.Product ?? '-'}</td>
 
       {/* Omzet */}
       <td className={`${tdMuted} text-right tabular-nums whitespace-nowrap`}>
@@ -73,16 +67,24 @@ export function TaskRow({ task, showChecked, onCheck }: TaskRowProps) {
       </td>
 
       {/* Naam */}
-      <td className={tdMuted}><TruncatedCell text={task.Naam} maxWidth="max-w-[140px]" /></td>
+      <td className={tdMuted}>
+        <div className="truncate max-w-[140px]">{task.Naam ?? '-'}</div>
+      </td>
 
       {/* Adres */}
-      <td className={tdMuted}><TruncatedCell text={task.Adres} maxWidth="max-w-[160px]" /></td>
+      <td className={tdMuted}>
+        <div className="truncate max-w-[160px]">{task.Adres ?? '-'}</div>
+      </td>
 
       {/* Plaats */}
-      <td className={tdMuted}><TruncatedCell text={task.Plaats} maxWidth="max-w-[120px]" /></td>
+      <td className={tdMuted}>
+        <div className="truncate max-w-[120px]">{task.Plaats ?? '-'}</div>
+      </td>
 
       {/* Colliomschrijving */}
-      <td className={tdMuted}><TruncatedCell text={task.Colliomschrijving} maxWidth="max-w-[120px]" /></td>
+      <td className={tdMuted}>
+        <div className="truncate max-w-[120px]">{task.Colliomschrijving ?? '-'}</div>
+      </td>
 
       {/* Commentaar */}
       <td className={`${tdBase} text-center`}>

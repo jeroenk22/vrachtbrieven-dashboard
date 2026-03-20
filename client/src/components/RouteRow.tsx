@@ -128,7 +128,7 @@ export function RouteRow({ route, day, showChecked, userName }: RouteRowProps) {
           ) : !tasks || tasks.length === 0 ? (
             <div className="px-4 py-3 text-slate-500 text-sm italic">Geen taken gevonden</div>
           ) : (
-            <div>
+            <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="text-[11px] uppercase tracking-wide text-slate-500 bg-slate-900/60">
