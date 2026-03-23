@@ -10,9 +10,25 @@ import {
   setTaskChecked,
   markRouteSeen,
 } from '../services/dashboard.service';
+import { addClient, removeClient, broadcast } from '../services/sse.service';
 import { SetTaskCheckedBody, MarkRouteSeenBody } from '../types/dashboard.types';
 
 const router = Router();
+
+// ------------------------------------------------------------
+// GET /dashboard/events
+// Server-Sent Events: clients ontvangen real-time updates
+// ------------------------------------------------------------
+router.get('/events', (req: Request, res: Response) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no');
+  res.flushHeaders();
+
+  addClient(res);
+  req.on('close', () => removeClient(res));
+});
 
 // ------------------------------------------------------------
 // GET /dashboard/routes
@@ -70,19 +86,34 @@ router.get('/tasks', async (req: Request, res: Response) => {
 router.post('/tasks/check', async (req: Request, res: Response) => {
   const body = req.body as Partial<SetTaskCheckedBody>;
 
-  if (body.ordSubTaskNo === undefined || body.checked === undefined || !body.checkedBy) {
+  if (
+    body.rideId === undefined ||
+    !body.routeName ||
+    body.ordSubTaskNo === undefined ||
+    body.checked === undefined ||
+    !body.checkedBy
+  ) {
     return res.status(400).json({
       ok: false,
-      error: 'ordSubTaskNo, checked en checkedBy zijn verplicht',
+      error: 'rideId, routeName, ordSubTaskNo, checked en checkedBy zijn verplicht',
     });
   }
 
   try {
     await setTaskChecked({
+      rideId: body.rideId,
+      routeName: body.routeName,
       ordSubTaskNo: body.ordSubTaskNo,
       checked: body.checked,
       checkedBy: body.checkedBy,
       comment: body.comment ?? null,
+    });
+    broadcast('task-updated', {
+      rideId: body.rideId,
+      routeName: body.routeName,
+      ordSubTaskNo: body.ordSubTaskNo,
+      checked: body.checked,
+      checkedBy: body.checkedBy,
     });
     return res.json({ ok: true });
   } catch (err) {

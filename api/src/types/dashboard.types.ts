@@ -96,6 +96,8 @@ export interface DashboardTask {
 // Request bodies
 // ------------------------------------------------------------
 export interface SetTaskCheckedBody {
+  rideId: number;
+  routeName: string;
   ordSubTaskNo: number;
   checked: boolean;
   checkedBy: string;
