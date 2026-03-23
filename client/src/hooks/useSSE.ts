@@ -26,6 +26,7 @@ export function useSSE(userName: string, onNotification: (message: string) => vo
       const data = JSON.parse(e.data) as TaskUpdatedEvent;
       // Invalideer taken van de betreffende route
       queryClient.invalidateQueries({ queryKey: ['tasks', data.rideId] });
+      queryClient.invalidateQueries({ queryKey: ['routes'] });
       // Toon melding alleen als de update van een andere gebruiker komt
       if (data.checkedBy !== userName) {
         const actie = data.checked ? 'afgevinkt' : 'check ongedaan gemaakt';
